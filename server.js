@@ -368,13 +368,15 @@ function countNodes(node) {
   return count;
 }
 
-// Khởi động server
-const server = app.listen(PORT, () => {
-  console.log(`=================================================`);
-  console.log(`🚀 Mindmap Web App đang chạy tại: http://localhost:${PORT}`);
-  console.log(`🔥 Firebase Realtime DB URL: ${DATABASE_URL}`);
-  console.log(`⚡ API Endpoints: http://localhost:${PORT}/api/mindmaps`);
-  console.log(`=================================================`);
-});
+// Khởi động server (chỉ lắng nghe cổng khi chạy trực tiếp qua node server.js / npm start)
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`=================================================`);
+    console.log(`🚀 Mindmap Web App đang chạy tại: http://localhost:${PORT}`);
+    console.log(`🔥 Firebase Realtime DB URL: ${DATABASE_URL}`);
+    console.log(`⚡ API Endpoints: http://localhost:${PORT}/api/mindmaps`);
+    console.log(`=================================================`);
+  });
+}
 
-module.exports = { app, server };
+module.exports = app;
