@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="midnight">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindFlow - Web Mindmap & Firebase Cloud Sync</title>
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/canvas.css">
+  <link rel="stylesheet" href="css/toolbar.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Top Header Navigation -->
+    <header id="app-header">
+      <div class="header-left">
+        <a class="app-brand" href="#" title="MindFlow - Web Mindmap">
+          <div class="brand-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+            </svg>
+          </div>
+          <span>MindFlow</span>
+        </a>
+
+        <!-- Fast Create New Map Button -->
+        <button id="btn-quick-create-map" class="btn btn-primary btn-sm" data-tooltip="Tạo Mindmap mới (Ctrl+N)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>Tạo Mới</span>
+        </button>
+
+        <div class="divider-vertical"></div>
+
+        <input type="text" id="map-title-input" class="map-title-input" value="Sơ đồ tư duy mới" title="Bấm để đổi tên">
+
+        <!-- Cloud Sync Status Badge -->
+        <div id="cloud-status-badge" class="cloud-status-badge status-syncing" data-tooltip="Trạng thái lưu trữ Firebase Cloud">
+          <span class="status-dot"></span>
+          <span id="cloud-status-text">Đang kết nối...</span>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <!-- History & Layout Actions -->
+        <button id="btn-undo" class="btn btn-icon btn-secondary" data-tooltip="Hoàn tác (Ctrl+Z)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
+        </button>
+        <button id="btn-redo" class="btn btn-icon btn-secondary" data-tooltip="Làm lại (Ctrl+Y)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg>
+        </button>
+
+        <div class="divider-vertical"></div>
+
+        <!-- Layout Selector Dropdown -->
+        <div style="position: relative;">
+          <button id="btn-layout-dropdown" class="btn btn-secondary" data-tooltip="Kiểu bố cục">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <span id="current-layout-label">Radial Mindmap</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <div id="layout-menu" class="dropdown-menu glass-panel">
+            <button class="dropdown-item active" data-layout="radial">🌐 Radial (Cân bằng 2 bên)</button>
+            <button class="dropdown-item" data-layout="right">➡️ Right Tree (Cây sang phải)</button>
+            <button class="dropdown-item" data-layout="top-down">⬇️ Org Chart (Từ trên xuống)</button>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item" id="btn-reset-layout">✨ Sắp xếp lại vị trí tự động</button>
+          </div>
+        </div>
+
+        <!-- Theme Selector Dropdown -->
+        <div style="position: relative;">
+          <button id="btn-theme-dropdown" class="btn btn-secondary" data-tooltip="Đổi bảng màu">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <span>Themes</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <div id="theme-menu" class="dropdown-menu glass-panel">
+            <button class="dropdown-item active" data-theme="midnight">🌙 Midnight Cyber</button>
+            <button class="dropdown-item" data-theme="minimal-light">☀️ Clean Minimal</button>
+            <button class="dropdown-item" data-theme="pastel-bloom">🌸 Pastel Bloom</button>
+            <button class="dropdown-item" data-theme="nordic-forest">🌲 Nordic Forest</button>
+            <button class="dropdown-item" data-theme="obsidian-nebula">🌌 Obsidian Nebula</button>
+          </div>
+        </div>
+
+        <!-- Fast Light / Dark Mode Toggle Button -->
+        <button id="btn-toggle-darkmode" class="btn btn-icon btn-secondary" data-tooltip="Chuyển chế độ Sáng / Tối" title="Chuyển chế độ Sáng / Tối">
+          <span id="darkmode-icon">☀️</span>
+        </button>
+      </div>
+
+      <div class="header-right">
+        <!-- Markdown Outline Toggle -->
+        <button id="btn-toggle-outline" class="btn btn-secondary" data-tooltip="Bật / Tắt Markdown Outline">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+          <span>Outline</span>
+        </button>
+
+        <!-- Templates Modal Trigger -->
+        <button id="btn-open-templates" class="btn btn-secondary" data-tooltip="Mẫu Mindmap có sẵn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          <span>Mẫu</span>
+        </button>
+
+        <!-- Cloud Maps Drawer Trigger -->
+        <button id="btn-open-cloud" class="btn btn-secondary" data-tooltip="Quản lý File Mindmap">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>
+          <span>Cloud Files</span>
+        </button>
+
+        <!-- Export Dropdown -->
+        <div style="position: relative;">
+          <button id="btn-export-dropdown" class="btn btn-primary" data-tooltip="Xuất file">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Xuất file</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <div id="export-menu" class="dropdown-menu glass-panel">
+            <button class="dropdown-item" id="btn-export-png">🖼️ Xuất ảnh PNG (HD)</button>
+            <button class="dropdown-item" id="btn-export-svg">📐 Xuất Vector SVG</button>
+            <button class="dropdown-item" id="btn-export-json">💾 Xuất file JSON (Backup)</button>
+            <button class="dropdown-item" id="btn-export-md">📝 Xuất Markdown (.md)</button>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item" id="btn-import-file">📂 Nhập file (JSON/MD)...</button>
+            <input type="file" id="file-import-input" accept=".json,.md,.txt" style="display: none;">
+          </div>
+        </div>
+
+        <!-- Presentation Mode -->
+        <button id="btn-presentation" class="btn btn-icon btn-secondary" data-tooltip="Thuyết trình (F5)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        </button>
+
+        <!-- Shortcuts Help -->
+        <button id="btn-shortcuts-help" class="btn btn-icon btn-secondary" data-tooltip="Phím tắt (?)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Multi-Mindmap Tabs Navigation Bar -->
+    <div id="tabs-bar">
+      <div id="tabs-container" class="tabs-container">
+        <!-- Rendered by JS -->
+      </div>
+      <button id="btn-tab-add-new" class="btn-new-tab" title="Tạo mindmap mới (Ctrl+N)">
+        <span>+</span> Thêm Mindmap
+      </button>
+    </div>
+
+    <!-- Main Canvas Area -->
+    <main id="canvas-container">
+      <div id="canvas-viewport">
+        <svg id="svg-layer"></svg>
+        <div id="nodes-layer"></div>
+      </div>
+      <div id="drop-indicator-line"></div>
+    </main>
+
+    <!-- Floating Node Action Toolbar -->
+    <div id="node-toolbar" class="glass-pill">
+      <button class="btn btn-icon btn-sm" id="tb-add-child" data-tooltip="Thêm nhánh con (Tab)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
+      <button class="btn btn-icon btn-sm" id="tb-add-sibling" data-tooltip="Thêm nhánh ngang hàng (Enter)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line><line x1="5" y1="19" x2="19" y2="19"></line></svg>
+      </button>
+      <button class="btn btn-icon btn-sm" id="tb-edit-text" data-tooltip="Sửa nội dung (F2)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+      </button>
+
+      <div class="divider-vertical" style="height: 18px;"></div>
+
+      <!-- Color Palette Picker -->
+      <div class="toolbar-group">
+        <div class="color-swatch" style="background: #3b82f6;" data-color="#3b82f6" data-tooltip="Xanh dương"></div>
+        <div class="color-swatch" style="background: #8b5cf6;" data-color="#8b5cf6" data-tooltip="Tím"></div>
+        <div class="color-swatch" style="background: #ec4899;" data-color="#ec4899" data-tooltip="Hồng"></div>
+        <div class="color-swatch" style="background: #10b981;" data-color="#10b981" data-tooltip="Xanh lá"></div>
+        <div class="color-swatch" style="background: #f59e0b;" data-color="#f59e0b" data-tooltip="Cam"></div>
+        <div class="color-swatch" style="background: #06b6d4;" data-color="#06b6d4" data-tooltip="Cyan"></div>
+      </div>
+
+      <div class="divider-vertical" style="height: 18px;"></div>
+
+      <!-- Shape Picker -->
+      <button class="btn btn-icon btn-sm" id="tb-shape-toggle" data-tooltip="Đổi hình dạng node">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="6"></rect></svg>
+      </button>
+
+      <!-- Emoji / Icon Picker -->
+      <button class="btn btn-icon btn-sm" id="tb-emoji-picker" data-tooltip="Thêm biểu tượng Emoji">
+        <span>😀</span>
+      </button>
+
+      <!-- Checkbox Progress -->
+      <button class="btn btn-icon btn-sm" id="tb-checkbox-toggle" data-tooltip="Bật/tắt Checkbox tiến độ">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+      </button>
+
+      <!-- Tag / Badge -->
+      <button class="btn btn-icon btn-sm" id="tb-add-tag" data-tooltip="Gắn thẻ nhãn (Tag)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+      </button>
+
+      <!-- Hyperlink -->
+      <button class="btn btn-icon btn-sm" id="tb-add-link" data-tooltip="Gắn liên kết URL">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+      </button>
+
+      <!-- Note -->
+      <button class="btn btn-icon btn-sm" id="tb-add-note" data-tooltip="Ghi chú chi tiết">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+      </button>
+
+      <!-- Comments / Discussion -->
+      <button class="btn btn-icon btn-sm" id="tb-add-comment" data-tooltip="Bình luận & Thảo luận (Shift+C)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      </button>
+
+      <div class="divider-vertical" style="height: 18px;"></div>
+
+      <!-- Delete Node -->
+      <button class="btn btn-icon btn-sm btn-danger" id="tb-delete-node" data-tooltip="Xóa nhánh (Delete)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+      </button>
+    </div>
+
+    <!-- Bottom Canvas Zoom & Navigation Controls -->
+    <div id="canvas-controls" class="glass-pill">
+      <button class="btn btn-icon btn-sm" id="btn-zoom-out" data-tooltip="Thu nhỏ (-)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
+      <span class="zoom-label" id="zoom-percentage">100%</span>
+      <button class="btn btn-icon btn-sm" id="btn-zoom-in" data-tooltip="Phóng to (+)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
+      <div class="divider-vertical" style="height: 16px;"></div>
+      <button class="btn btn-icon btn-sm" id="btn-fit-view" data-tooltip="Căn vừa màn hình (Shift+1)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+      </button>
+      <button class="btn btn-icon btn-sm" id="btn-center-root" data-tooltip="Về trung tâm (Home)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><circle cx="12" cy="12" r="8"></circle></svg>
+      </button>
+    </div>
+
+    <!-- Minimap Navigator Widget -->
+    <div id="minimap-card" class="glass-panel" data-tooltip="Minimap toàn cảnh">
+      <canvas id="minimap-canvas" width="180" height="120"></canvas>
+      <div id="minimap-viewport-indicator"></div>
+    </div>
+
+    <!-- Markdown Outline Sync Side Drawer -->
+    <aside id="outline-drawer" class="side-drawer">
+      <div class="drawer-header">
+        <div class="drawer-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line></svg>
+          <span>Markdown Outline</span>
+        </div>
+        <button class="modal-close" id="btn-close-outline" title="Đóng bảng Outline (Esc)" aria-label="Đóng bảng Outline">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="drawer-body">
+        <p style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 8px;">
+          💡 Gõ danh sách markdown với dấu thụt đầu dòng (Tab). Mindmap và Outline sẽ tự động đồng bộ 2 chiều tức thì.
+        </p>
+        <textarea id="outline-editor" spellcheck="false" placeholder="- Chủ đề chính&#10;  - Nhánh con 1&#10;    - Ý chi tiết&#10;  - Nhánh con 2"></textarea>
+      </div>
+    </aside>
+
+    <!-- Node Comments & Discussion Side Drawer -->
+    <aside id="comments-drawer" class="side-drawer">
+      <div class="drawer-header">
+        <div class="drawer-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          <span>Bình Luận & Thảo Luận</span>
+        </div>
+        <button class="modal-close" id="btn-close-comments" title="Đóng bảng bình luận (Esc)" aria-label="Đóng bảng bình luận">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="drawer-body" id="comments-drawer-body">
+        <div class="comment-target-node-box">
+          <span class="target-node-badge">Nhánh đang chọn:</span>
+          <div id="comment-target-node-title" class="target-node-title">Tên nhánh</div>
+        </div>
+        <div id="comments-list-container" class="comments-list-container">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+      <div class="drawer-footer comments-footer">
+        <div class="comment-author-row">
+          <span class="author-label">👤 Tên người viết:</span>
+          <input type="text" id="comment-author-input" class="comment-author-input" value="Bạn" maxlength="30" placeholder="Tên của bạn...">
+        </div>
+        <div class="comment-input-row">
+          <textarea id="comment-compose-textarea" placeholder="Viết ý kiến thảo luận... (Ctrl+Enter để gửi)" rows="2"></textarea>
+          <button id="btn-send-comment" class="btn btn-primary btn-icon" title="Gửi bình luận (Ctrl+Enter)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Cloud Mindmaps Manager Side Drawer -->
+    <aside id="cloud-drawer" class="side-drawer left-drawer">
+      <div class="drawer-header">
+        <div class="drawer-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>
+          <span>Firebase Cloud Files</span>
+        </div>
+        <button class="modal-close" id="btn-close-cloud" title="Đóng bảng Cloud (Esc)" aria-label="Đóng">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="drawer-body">
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <button id="btn-new-map" class="btn btn-primary" style="flex: 1;" title="Tạo sơ đồ mới">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Tạo mới
+          </button>
+          <button id="btn-duplicate-current" class="btn btn-secondary" title="Nhân bản sơ đồ đang mở">
+            📋 Nhân bản
+          </button>
+          <button id="btn-refresh-cloud" class="btn btn-secondary btn-icon" data-tooltip="Tải lại danh sách">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+          </button>
+        </div>
+
+        <!-- Realtime Search Cloud Files -->
+        <div style="margin-bottom: 14px;">
+          <input type="text" id="cloud-search-input" class="map-title-input" placeholder="🔍 Tìm kiếm sơ đồ..." style="width: 100%; max-width: 100%; border: 1px solid var(--border-glass); background: rgba(0,0,0,0.2);">
+        </div>
+
+        <div id="cloud-maps-list">
+          <!-- Populated by JS -->
+          <div style="text-align: center; color: var(--text-muted); padding: 20px;">Đang tải danh sách từ Firebase...</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Create New Mindmap Modal -->
+    <div id="new-map-modal" class="modal-overlay">
+      <div class="modal-container glass-panel" style="max-width: 520px;">
+        <div class="modal-header">
+          <div class="modal-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span>Tạo Mindmap Mới</span>
+          </div>
+          <button class="modal-close" id="btn-close-new-map-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Tên sơ đồ tư duy:</label>
+            <input type="text" id="new-map-title-input" class="map-title-input" value="Sơ đồ tư duy mới" style="width: 100%; max-width: 100%; border: 1px solid var(--border-glass); background: rgba(0,0,0,0.2); font-size: 15px; padding: 8px 12px;" placeholder="Ví dụ: Kế hoạch kinh doanh 2026...">
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Chọn mẫu khởi đầu:</label>
+            <select id="new-map-template-select" style="width: 100%; padding: 8px 12px; border-radius: 8px; background: var(--bg-surface-elevated); border: 1px solid var(--border-glass); color: var(--text-primary); outline: none;">
+              <option value="blank">📄 Bản vẽ trống (Blank Mindmap)</option>
+              <option value="roadmap">🚀 Lộ trình Sản phẩm (Product Roadmap)</option>
+              <option value="swot">🎯 Phân tích Chiến lược SWOT</option>
+              <option value="brainstorm">💡 Động não Ý tưởng (Brainstorming)</option>
+              <option value="study-plan">📚 Kế hoạch Học tập & Ôn thi</option>
+              <option value="org-chart">🏛️ Cơ cấu Tổ chức (Org Chart)</option>
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Bố cục mặc định:</label>
+              <select id="new-map-layout-select" style="width: 100%; padding: 8px 10px; border-radius: 8px; background: var(--bg-surface-elevated); border: 1px solid var(--border-glass); color: var(--text-primary); outline: none;">
+                <option value="radial">🌐 Radial (Cân bằng 2 bên)</option>
+                <option value="right">➡️ Right Tree (Cây sang phải)</option>
+                <option value="top-down">⬇️ Org Chart (Từ trên xuống)</option>
+              </select>
+            </div>
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Giao diện (Theme):</label>
+              <select id="new-map-theme-select" style="width: 100%; padding: 8px 10px; border-radius: 8px; background: var(--bg-surface-elevated); border: 1px solid var(--border-glass); color: var(--text-primary); outline: none;">
+                <option value="midnight">🌙 Midnight Cyber (Tối)</option>
+                <option value="minimal-light">☀️ Clean Minimal (Sáng)</option>
+                <option value="pastel-bloom">🌸 Pastel Bloom</option>
+                <option value="nordic-forest">🌲 Nordic Forest</option>
+                <option value="obsidian-nebula">🌌 Obsidian Nebula</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="btn-cancel-new-map">Hủy</button>
+          <button class="btn btn-primary" id="btn-confirm-new-map">
+            <span>🚀 Tạo Sơ Đồ</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Templates Selection Modal -->
+    <div id="templates-modal" class="modal-overlay">
+      <div class="modal-container glass-panel">
+        <div class="modal-header">
+          <div class="modal-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            <span>Chọn Mẫu Mindmap Có Sẵn</span>
+          </div>
+          <button class="modal-close" id="btn-close-templates-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px;" id="templates-grid">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Help Modal -->
+    <div id="shortcuts-modal" class="modal-overlay">
+      <div class="modal-container glass-panel" style="max-width: 540px;">
+        <div class="modal-header">
+          <div class="modal-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <span>Bảng Phím Tắt Tiện Dụng</span>
+          </div>
+          <button class="modal-close" id="btn-close-shortcuts-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <tr style="border-bottom: 1px solid var(--border-subtle);"><td style="padding: 8px 4px; font-weight: 700; color: var(--accent-primary);"><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Tab</kbd></td><td style="padding: 8px 4px;">Tạo nhánh con (Child node)</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);"><td style="padding: 8px 4px; font-weight: 700; color: var(--accent-primary);"><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Enter</kbd></td><td style="padding: 8px 4px;">Tạo nhánh ngang hàng (Sibling node)</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);"><td style="padding: 8px 4px; font-weight: 700; color: var(--accent-primary);"><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">F2</kbd> / Double Click</td><td style="padding: 8px 4px;">Chỉnh sửa nội dung node</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);"><td style="padding: 8px 4px; font-weight: 700; color: var(--accent-primary);"><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Delete</kbd> / <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Backspace</kbd></td><td style="padding: 8px 4px;">Xóa node đang chọn</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);"><td style="padding: 8px 4px; font-weight: 700; color: var(--accent-primary);"><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">↑ ↓ ← →</kbd></td><td style="padding: 8px 4px;">Di chuyển chọn các node lân cận</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);"><td style="padding: 8px 4px; font-weight: 700; color: var(--accent-primary);"><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Space + Kéo chuột</kbd></td><td style="padding: 8px 4px;">Di chuyển khung nhìn Canvas (Pan)</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);"><td style="padding: 8px 4px; font-weight: 700; color: var(--accent-primary);"><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Ctrl + Z</kbd> / <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Ctrl + Y</kbd></td><td style="padding: 8px 4px;">Hoàn tác / Làm lại (Undo / Redo)</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);"><td style="padding: 8px 4px; font-weight: 700; color: var(--accent-primary);"><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Ctrl + Cuộn chuột</kbd></td><td style="padding: 8px 4px;">Thu phóng màn hình (Zoom)</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);"><td style="padding: 8px 4px; font-weight: 700; color: var(--accent-primary);"><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Shift + C</kbd></td><td style="padding: 8px 4px;">Mở bảng Bình luận & Thảo luận nhánh</td></tr>
+            <tr><td style="padding: 8px 4px; font-weight: 700; color: var(--accent-primary);"><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">F5</kbd> / <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Esc</kbd></td><td style="padding: 8px 4px;">Bật / Tắt chế độ Thuyết trình (Presentation)</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Generic Input Prompt Modal (for Note, Link, Tag) -->
+    <div id="input-modal" class="modal-overlay">
+      <div class="modal-container glass-panel" style="max-width: 440px;">
+        <div class="modal-header">
+          <div class="modal-title" id="input-modal-title">Tiêu đề</div>
+          <button class="modal-close" id="btn-close-input-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div id="input-modal-content"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="btn-cancel-input-modal">Hủy</button>
+          <button class="btn btn-primary" id="btn-confirm-input-modal">Lưu</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notifications Area -->
+    <div id="toast-container"></div>
+  </div>
+
+  <!-- Application Modules Scripts -->
+  <script src="js/firebase-client.js"></script>
+  <script src="js/mindmap-tree.js"></script>
+  <script src="js/layout-engine.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/interaction.js"></script>
+  <script src="js/outline-sync.js"></script>
+  <script src="js/export-import.js"></script>
+  <script src="js/templates.js"></script>
+  <script src="js/ui-controller.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

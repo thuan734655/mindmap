@@ -1,0 +1,204 @@
+/* ==========================================================================
+   THEMES & COLOR PALETTES FOR MINDMAP PRO
+   ========================================================================== */
+
+:root {
+  /* Default: Midnight Cyber Theme */
+  --bg-primary: #0b0f19;
+  --bg-secondary: #111827;
+  --bg-surface: rgba(17, 24, 39, 0.75);
+  --bg-surface-elevated: rgba(31, 41, 55, 0.85);
+  --bg-canvas: #090d16;
+  --canvas-grid-dot: rgba(255, 255, 255, 0.07);
+  
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(99, 102, 241, 0.6);
+  --border-glass: rgba(255, 255, 255, 0.12);
+  
+  --accent-primary: #6366f1;
+  --accent-primary-hover: #4f46e5;
+  --accent-glow: rgba(99, 102, 241, 0.35);
+  
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #06b6d4;
+
+  --root-bg: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --root-text: #ffffff;
+  --root-border: rgba(255, 255, 255, 0.25);
+  --root-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.5), 0 8px 10px -6px rgba(168, 85, 247, 0.5);
+
+  --connector-default: #4f46e5;
+  --connector-glow: rgba(79, 70, 229, 0.25);
+  
+  /* Branch Color Spectrum (Auto assigned to level 1 branches) */
+  --branch-color-1: #3b82f6; /* Blue */
+  --branch-color-2: #8b5cf6; /* Purple */
+  --branch-color-3: #ec4899; /* Pink */
+  --branch-color-4: #f97316; /* Orange */
+  --branch-color-5: #10b981; /* Emerald */
+  --branch-color-6: #06b6d4; /* Cyan */
+  --branch-color-7: #eab308; /* Yellow */
+  --branch-color-8: #f43f5e; /* Rose */
+}
+
+/* Theme: Clean Minimal (Light Mode) */
+[data-theme="minimal-light"] {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-surface: rgba(255, 255, 255, 0.82);
+  --bg-surface-elevated: #ffffff;
+  --bg-canvas: #f1f5f9;
+  --canvas-grid-dot: rgba(0, 0, 0, 0.08);
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-focus: rgba(37, 99, 235, 0.6);
+  --border-glass: rgba(0, 0, 0, 0.1);
+
+  --accent-primary: #2563eb;
+  --accent-primary-hover: #1d4ed8;
+  --accent-glow: rgba(37, 99, 235, 0.2);
+
+  --root-bg: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  --root-text: #ffffff;
+  --root-border: rgba(255, 255, 255, 0.2);
+  --root-shadow: 0 10px 20px -3px rgba(15, 23, 42, 0.25);
+
+  --connector-default: #94a3b8;
+  --connector-glow: rgba(148, 163, 184, 0.2);
+
+  --branch-color-1: #2563eb;
+  --branch-color-2: #7c3aed;
+  --branch-color-3: #db2777;
+  --branch-color-4: #ea580c;
+  --branch-color-5: #059669;
+  --branch-color-6: #0891b2;
+  --branch-color-7: #ca8a04;
+  --branch-color-8: #e11d48;
+}
+
+/* Theme: Pastel Bloom */
+[data-theme="pastel-bloom"] {
+  --bg-primary: #1e1b2e;
+  --bg-secondary: #28243d;
+  --bg-surface: rgba(40, 36, 61, 0.85);
+  --bg-surface-elevated: rgba(53, 48, 80, 0.9);
+  --bg-canvas: #161424;
+  --canvas-grid-dot: rgba(244, 114, 182, 0.12);
+
+  --text-primary: #fdf2f8;
+  --text-secondary: #fbcfe8;
+  --text-muted: #a78bfa;
+
+  --border-subtle: rgba(244, 114, 182, 0.15);
+  --border-focus: rgba(236, 72, 153, 0.6);
+  --border-glass: rgba(244, 114, 182, 0.25);
+
+  --accent-primary: #f472b6;
+  --accent-primary-hover: #ec4899;
+  --accent-glow: rgba(244, 114, 182, 0.35);
+
+  --root-bg: linear-gradient(135deg, #f43f5e 0%, #ec4899 50%, #d946ef 100%);
+  --root-text: #ffffff;
+  --root-border: rgba(255, 255, 255, 0.3);
+  --root-shadow: 0 10px 25px -5px rgba(244, 63, 94, 0.45);
+
+  --connector-default: #ec4899;
+  --connector-glow: rgba(236, 72, 153, 0.3);
+
+  --branch-color-1: #f472b6;
+  --branch-color-2: #c084fc;
+  --branch-color-3: #818cf8;
+  --branch-color-4: #38bdf8;
+  --branch-color-5: #34d399;
+  --branch-color-6: #fbbf24;
+  --branch-color-7: #fb7185;
+  --branch-color-8: #a78bfa;
+}
+
+/* Theme: Nordic Forest */
+[data-theme="nordic-forest"] {
+  --bg-primary: #0d1b1e;
+  --bg-secondary: #162a2d;
+  --bg-surface: rgba(22, 42, 45, 0.85);
+  --bg-surface-elevated: rgba(30, 58, 62, 0.9);
+  --bg-canvas: #091315;
+  --canvas-grid-dot: rgba(52, 211, 153, 0.1);
+
+  --text-primary: #ecfdf5;
+  --text-secondary: #a7f3d0;
+  --text-muted: #5eead4;
+
+  --border-subtle: rgba(52, 211, 153, 0.15);
+  --border-focus: rgba(16, 185, 129, 0.6);
+  --border-glass: rgba(52, 211, 153, 0.25);
+
+  --accent-primary: #10b981;
+  --accent-primary-hover: #059669;
+  --accent-glow: rgba(16, 185, 129, 0.35);
+
+  --root-bg: linear-gradient(135deg, #059669 0%, #0d9488 50%, #0284c7 100%);
+  --root-text: #ffffff;
+  --root-border: rgba(255, 255, 255, 0.3);
+  --root-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.45);
+
+  --connector-default: #0d9488;
+  --connector-glow: rgba(13, 148, 136, 0.3);
+
+  --branch-color-1: #10b981;
+  --branch-color-2: #14b8a6;
+  --branch-color-3: #06b6d4;
+  --branch-color-4: #84cc16;
+  --branch-color-5: #eab308;
+  --branch-color-6: #f97316;
+  --branch-color-7: #6366f1;
+  --branch-color-8: #3b82f6;
+}
+
+/* Theme: Obsidian Nebula */
+[data-theme="obsidian-nebula"] {
+  --bg-primary: #120c1f;
+  --bg-secondary: #1a122e;
+  --bg-surface: rgba(26, 18, 46, 0.85);
+  --bg-surface-elevated: rgba(38, 26, 66, 0.9);
+  --bg-canvas: #0b0714;
+  --canvas-grid-dot: rgba(168, 85, 247, 0.12);
+
+  --text-primary: #faf5ff;
+  --text-secondary: #e9d5ff;
+  --text-muted: #c084fc;
+
+  --border-subtle: rgba(168, 85, 247, 0.18);
+  --border-focus: rgba(168, 85, 247, 0.6);
+  --border-glass: rgba(168, 85, 247, 0.25);
+
+  --accent-primary: #a855f7;
+  --accent-primary-hover: #9333ea;
+  --accent-glow: rgba(168, 85, 247, 0.4);
+
+  --root-bg: linear-gradient(135deg, #7c3aed 0%, #c026d3 50%, #f43f5e 100%);
+  --root-text: #ffffff;
+  --root-border: rgba(255, 255, 255, 0.3);
+  --root-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.5);
+
+  --connector-default: #a855f7;
+  --connector-glow: rgba(168, 85, 247, 0.3);
+
+  --branch-color-1: #a855f7;
+  --branch-color-2: #d946ef;
+  --branch-color-3: #ec4899;
+  --branch-color-4: #f43f5e;
+  --branch-color-5: #6366f1;
+  --branch-color-6: #06b6d4;
+  --branch-color-7: #10b981;
+  --branch-color-8: #f59e0b;
+}
