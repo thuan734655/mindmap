@@ -21,8 +21,10 @@ let firebaseInitialized = false;
 let firebaseStatusMessage = 'Chưa khởi tạo';
 const DATABASE_URL = process.env.FIREBASE_DATABASE_URL || 'https://test-11432-default-rtdb.firebaseio.com';
 
-// Fallback local storage file if offline
-const LOCAL_DATA_FILE = path.join(__dirname, '.local_mindmaps_backup.json');
+// Fallback local storage file if offline (sử dụng /tmp khi chạy trên Vercel Serverless)
+const LOCAL_DATA_FILE = process.env.VERCEL
+  ? path.join('/tmp', '.local_mindmaps_backup.json')
+  : path.join(__dirname, '.local_mindmaps_backup.json');
 
 // Realtime SSE connected clients
 const sseClients = new Set();
@@ -46,6 +48,11 @@ function saveLocalBackup(data) {
     console.error('Lỗi ghi local backup:', err);
   }
 }
+
+// Phục vụ trang index.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // Khởi tạo Firebase Admin SDK với cấu hình từ file .env (hoặc JSON fallback)
 try {
