@@ -55,7 +55,6 @@
 | Phím tắt | Chức năng |
 | :--- | :--- |
 | <kbd>Tab</kbd> | Tạo nhánh con (Child Node) |
-| <kbd>Enter</kbd> | Tạo nhánh ngang hàng (Sibling Node) |
 | <kbd>F2</kbd> / Double Click | Chỉnh sửa văn bản trực tiếp trên nhánh |
 | <kbd>Delete</kbd> / <kbd>Backspace</kbd> | Xóa nhánh đang chọn |
 | <kbd>Shift</kbd> + <kbd>C</kbd> | Mở bảng Bình luận & Thảo luận nhánh |

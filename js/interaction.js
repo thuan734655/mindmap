@@ -444,18 +444,7 @@ class InteractionManager {
       return;
     }
 
-    // 2. Enter: Thêm nhánh ngang hàng (hoặc thêm nhánh chính từ root)
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const newNode = window.appState.addSiblingNode(selectedId);
-      if (newNode) {
-        window.appState.setSelectedNode(newNode.id);
-        this.startNodeEdit(newNode.id, true);
-      }
-      return;
-    }
-
-    // 3. F2: Chỉnh sửa text
+    // 2. F2: Chỉnh sửa text
     if (e.key === 'F2') {
       e.preventDefault();
       this.startNodeEdit(selectedId, true);
