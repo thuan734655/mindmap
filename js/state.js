@@ -279,11 +279,12 @@ class AppState {
 
   // --- NODE COMMENTS MANAGEMENT ---
 
-  addNodeComment(nodeId, text, author) {
-    if (!nodeId || !text || !text.trim()) return null;
+  addNodeComment(nodeId, text, author, translation = '') {
+    if (!nodeId || (!text && !translation)) return null;
     this.pushSnapshot();
     const comment = MindmapTree.addComment(this.currentMap.root, nodeId, {
-      text: text.trim(),
+      text: (text || '').trim(),
+      translation: (translation || '').trim(),
       author: author || 'Bạn'
     });
     if (comment) {
@@ -293,6 +294,19 @@ class AppState {
       window.uiController?.showToast('Đã thêm bình luận mới', 'success');
     }
     return comment;
+  }
+
+  updateNodeComment(nodeId, commentId, updateDataOrText) {
+    if (!nodeId || !commentId) return null;
+    this.pushSnapshot();
+    const updated = MindmapTree.updateComment(this.currentMap.root, nodeId, commentId, updateDataOrText);
+    if (updated) {
+      this.render();
+      this.scheduleAutoSave();
+      window.uiController?.renderCommentsDrawer(nodeId);
+      window.uiController?.showToast('Đã lưu thay đổi bình luận', 'success');
+    }
+    return updated;
   }
 
   deleteNodeComment(nodeId, commentId) {

@@ -33,6 +33,8 @@ class UIController {
     this.commentsListContainer = document.getElementById('comments-list-container');
     this.commentAuthorInput = document.getElementById('comment-author-input');
     this.commentComposeTextarea = document.getElementById('comment-compose-textarea');
+    this.commentComposeTranslation = document.getElementById('comment-compose-translation');
+    this.btnToggleTranslationInput = document.getElementById('btn-toggle-translation-input');
     this.btnSendComment = document.getElementById('btn-send-comment');
     this.activeCommentNodeId = null;
 
@@ -209,6 +211,17 @@ class UIController {
       });
     }
 
+    if (this.btnToggleTranslationInput) {
+      this.btnToggleTranslationInput.addEventListener('click', () => {
+        if (this.commentComposeTranslation) {
+          const isHidden = this.commentComposeTranslation.classList.toggle('hidden');
+          if (!isHidden) {
+            this.commentComposeTranslation.focus();
+          }
+        }
+      });
+    }
+
     if (this.btnSendComment) {
       this.btnSendComment.addEventListener('click', () => this.handleSendComment());
     }
@@ -216,6 +229,15 @@ class UIController {
     if (this.commentComposeTextarea) {
       this.commentComposeTextarea.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && (e.ctrlKey || e.metaKey || !e.shiftKey)) {
+          e.preventDefault();
+          this.handleSendComment();
+        }
+      });
+    }
+
+    if (this.commentComposeTranslation) {
+      this.commentComposeTranslation.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
           e.preventDefault();
           this.handleSendComment();
         }
@@ -766,19 +788,49 @@ class UIController {
     comments.forEach(cmt => {
       const authorInitial = (cmt.author || 'B').trim().charAt(0).toUpperCase();
       const timeStr = this.formatTimeAgo(cmt.createdAt);
+      const editedBadge = cmt.updatedAt ? `<span class="comment-edited-badge" title="Đã sửa lúc ${new Date(cmt.updatedAt).toLocaleString('vi-VN')}">(đã sửa)</span>` : '';
+      const hasTranslation = Boolean(cmt.translation && cmt.translation.trim());
+
       html += `
-        <div class="comment-card" id="comment-card-${cmt.id}">
+        <div class="comment-card" id="comment-card-${cmt.id}" data-comment-id="${cmt.id}">
           <div class="comment-card-header">
             <div class="comment-author-avatar">${authorInitial}</div>
             <div class="comment-meta">
               <span class="comment-author-name">${this.escapeHtml(cmt.author || 'Bạn')}</span>
-              <span class="comment-timestamp" title="${cmt.createdAt ? new Date(cmt.createdAt).toLocaleString('vi-VN') : ''}">${timeStr}</span>
+              <span class="comment-timestamp" title="${cmt.createdAt ? new Date(cmt.createdAt).toLocaleString('vi-VN') : ''}">
+                ${timeStr} ${editedBadge}
+              </span>
             </div>
-            <button class="btn btn-icon btn-sm btn-comment-delete" title="Xóa bình luận" onclick="window.appState.deleteNodeComment('${targetId}', '${cmt.id}')">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            </button>
+            <div class="comment-actions">
+              <button class="btn btn-icon btn-sm btn-comment-trans" title="${hasTranslation ? 'Sửa bản dịch (🇯🇵/🇻🇳)' : '+ Thêm bản dịch (🇯🇵/🇻🇳)'}" onclick="window.uiController.startEditComment('${targetId}', '${cmt.id}', true)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              </button>
+              <button class="btn btn-icon btn-sm btn-comment-edit" title="Chỉnh sửa bình luận" onclick="window.uiController.startEditComment('${targetId}', '${cmt.id}', false)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              </button>
+              <button class="btn btn-icon btn-sm btn-comment-delete" title="Xóa bình luận" onclick="window.appState.deleteNodeComment('${targetId}', '${cmt.id}')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+            </div>
           </div>
-          <div class="comment-card-body">${this.formatCommentText(cmt.text)}</div>
+          <div class="comment-card-body" id="comment-body-${cmt.id}">
+            <div class="comment-main-text" ondblclick="window.uiController.startEditComment('${targetId}', '${cmt.id}', false)" title="Nhấp đúp để chỉnh sửa">${this.formatCommentText(cmt.text)}</div>
+            ${hasTranslation ? `
+              <div class="comment-translation-box" ondblclick="window.uiController.startEditComment('${targetId}', '${cmt.id}', true)" title="Nhấp đúp để sửa bản dịch">
+                <div class="comment-translation-header">
+                  <span class="translation-tag">🌐 Bản dịch (🇯🇵 日本語 / 🇻🇳 Tiếng Việt)</span>
+                </div>
+                <div class="comment-translation-text">${this.formatCommentText(cmt.translation)}</div>
+              </div>
+            ` : `
+              <div class="comment-translation-add-btn">
+                <button class="btn btn-ghost btn-xs btn-add-trans" onclick="window.uiController.startEditComment('${targetId}', '${cmt.id}', true)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                  <span>+ Thêm bản dịch (🇯🇵/🇻🇳)</span>
+                </button>
+              </div>
+            `}
+          </div>
         </div>
       `;
     });
@@ -792,18 +844,105 @@ class UIController {
     }
   }
 
+  startEditComment(nodeId, commentId, focusTranslation = false) {
+    const card = document.getElementById(`comment-card-${commentId}`);
+    if (!card) return;
+
+    const node = MindmapTree.findNode(window.appState.currentMap.root, nodeId);
+    if (!node || !node.comments) return;
+
+    const cmt = node.comments.find(c => c.id === commentId);
+    if (!cmt) return;
+
+    const bodyEl = document.getElementById(`comment-body-${commentId}`);
+    if (!bodyEl) return;
+
+    if (card.classList.contains('is-editing')) return;
+    card.classList.add('is-editing');
+
+    bodyEl.innerHTML = `
+      <div class="comment-edit-form">
+        <div class="edit-field-group">
+          <label class="edit-field-label">📝 Nội dung chính (Tiếng Việt / 日本語):</label>
+          <textarea class="comment-edit-textarea" id="comment-edit-input-${commentId}" rows="2" placeholder="Nội dung chính...">${this.escapeHtml(cmt.text || '')}</textarea>
+        </div>
+        <div class="edit-field-group">
+          <label class="edit-field-label">🌐 Bản dịch (🇯🇵 日本語 / 🇻🇳 Tiếng Việt):</label>
+          <textarea class="comment-edit-textarea comment-trans-textarea" id="comment-edit-trans-${commentId}" rows="2" placeholder="Nhập bản dịch tiếng Nhật hoặc tiếng Việt...">${this.escapeHtml(cmt.translation || '')}</textarea>
+        </div>
+        <div class="comment-edit-actions">
+          <button class="btn btn-ghost btn-xs btn-cancel-comment-edit" onclick="window.uiController.cancelEditComment('${nodeId}', '${commentId}')">Hủy</button>
+          <button class="btn btn-primary btn-xs btn-save-comment-edit" onclick="window.uiController.saveEditComment('${nodeId}', '${commentId}')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Lưu thay đổi (Ctrl+Enter)</span>
+          </button>
+        </div>
+      </div>
+    `;
+
+    const mainInput = document.getElementById(`comment-edit-input-${commentId}`);
+    const transInput = document.getElementById(`comment-edit-trans-${commentId}`);
+
+    const targetInput = (focusTranslation && transInput) ? transInput : mainInput;
+    if (targetInput) {
+      targetInput.focus();
+      targetInput.setSelectionRange(targetInput.value.length, targetInput.value.length);
+    }
+
+    [mainInput, transInput].forEach(textarea => {
+      if (!textarea) return;
+      textarea.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          this.saveEditComment(nodeId, commentId);
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          this.cancelEditComment(nodeId, commentId);
+        }
+      });
+    });
+  }
+
+  saveEditComment(nodeId, commentId) {
+    const mainInput = document.getElementById(`comment-edit-input-${commentId}`);
+    const transInput = document.getElementById(`comment-edit-trans-${commentId}`);
+    if (!mainInput && !transInput) return;
+
+    const newText = mainInput ? mainInput.value.trim() : '';
+    const newTranslation = transInput ? transInput.value.trim() : '';
+
+    if (!newText && !newTranslation) {
+      this.showToast('Vui lòng nhập nội dung bình luận hoặc bản dịch', 'warning');
+      return;
+    }
+
+    window.appState.updateNodeComment(nodeId, commentId, {
+      text: newText,
+      translation: newTranslation
+    });
+  }
+
+  cancelEditComment(nodeId, commentId) {
+    this.renderCommentsDrawer(nodeId);
+  }
+
   handleSendComment() {
     if (!this.activeCommentNodeId) return;
     const text = this.commentComposeTextarea ? this.commentComposeTextarea.value.trim() : '';
-    if (!text) return;
+    const translation = this.commentComposeTranslation ? this.commentComposeTranslation.value.trim() : '';
+    if (!text && !translation) return;
 
     const author = (this.commentAuthorInput ? this.commentAuthorInput.value.trim() : '') || 'Bạn';
     localStorage.setItem('mindmap_author_name', author);
 
-    window.appState.addNodeComment(this.activeCommentNodeId, text, author);
+    window.appState.addNodeComment(this.activeCommentNodeId, text, author, translation);
 
     if (this.commentComposeTextarea) {
       this.commentComposeTextarea.value = '';
+    }
+    if (this.commentComposeTranslation) {
+      this.commentComposeTranslation.value = '';
+      this.commentComposeTranslation.classList.add('hidden');
     }
   }
 

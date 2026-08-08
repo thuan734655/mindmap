@@ -221,12 +221,14 @@ class MindmapTree {
     if (!node.comments) node.comments = [];
 
     let text = '';
+    let translation = '';
     let author = 'Bạn';
     let avatar = '💬';
     let createdAt = new Date().toISOString();
 
     if (typeof commentDataOrText === 'object' && commentDataOrText !== null) {
       text = commentDataOrText.text || '';
+      translation = commentDataOrText.translation || '';
       author = commentDataOrText.author || 'Bạn';
       avatar = commentDataOrText.avatar || '💬';
       createdAt = commentDataOrText.createdAt || new Date().toISOString();
@@ -240,6 +242,7 @@ class MindmapTree {
       author: author.trim(),
       avatar: avatar,
       text: text.trim(),
+      translation: (translation || '').trim(),
       createdAt: createdAt
     };
     node.comments.push(newComment);
@@ -254,12 +257,17 @@ class MindmapTree {
     return node.comments.length < initialLen;
   }
 
-  static updateComment(root, nodeId, commentId, newText) {
+  static updateComment(root, nodeId, commentId, updateDataOrText) {
     const node = this.findNode(root, nodeId);
     if (!node || !node.comments) return null;
     const c = node.comments.find(item => item.id === commentId);
     if (c) {
-      c.text = (newText || '').trim();
+      if (typeof updateDataOrText === 'object' && updateDataOrText !== null) {
+        if (updateDataOrText.text !== undefined) c.text = updateDataOrText.text.trim();
+        if (updateDataOrText.translation !== undefined) c.translation = updateDataOrText.translation.trim();
+      } else {
+        c.text = String(updateDataOrText || '').trim();
+      }
       c.updatedAt = new Date().toISOString();
       return c;
     }

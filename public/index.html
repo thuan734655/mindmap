@@ -295,11 +295,17 @@
       </div>
       <div class="drawer-footer comments-footer">
         <div class="comment-author-row">
-          <span class="author-label">👤 Tên người viết:</span>
+          <span class="author-label">👤 Người viết:</span>
           <input type="text" id="comment-author-input" class="comment-author-input" value="Bạn" maxlength="30" placeholder="Tên của bạn...">
+          <button type="button" id="btn-toggle-translation-input" class="btn btn-ghost btn-xs btn-toggle-trans" title="Mở ô nhập bản dịch tiếng Nhật / tiếng Việt">
+            <span>🌐 + Bản dịch (🇯🇵/🇻🇳)</span>
+          </button>
         </div>
         <div class="comment-input-row">
-          <textarea id="comment-compose-textarea" placeholder="Viết ý kiến thảo luận... (Ctrl+Enter để gửi)" rows="2"></textarea>
+          <div class="comment-inputs-stack">
+            <textarea id="comment-compose-textarea" placeholder="Nội dung bình luận (Tiếng Việt / 日本語)... (Ctrl+Enter để gửi)" rows="2"></textarea>
+            <textarea id="comment-compose-translation" class="comment-translation-input hidden" placeholder="🌐 Bản dịch (Tiếng Nhật 🇯🇵 / Tiếng Việt 🇻🇳)..." rows="2"></textarea>
+          </div>
           <button id="btn-send-comment" class="btn btn-primary btn-icon" title="Gửi bình luận (Ctrl+Enter)">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
           </button>
